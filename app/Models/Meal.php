@@ -12,9 +12,13 @@ class Meal extends Model
     use HasFactory, SoftDeletes, Translatable;
 
     public $translatedAttributes = ['title', 'description'];
-    protected $hidden = ['links'];
+    protected $hidden = ['links', 'category_id', 'translations', 'created_at', 'updated_at', 'deleted_at'];
 
     protected $appends = array('status');
+
+    public function category() {
+        return $this->hasOne(Category::class, "id", "category_id");
+    }
 
     protected function getStatusAttribute() {
         if ($this->deleted_at != null) {

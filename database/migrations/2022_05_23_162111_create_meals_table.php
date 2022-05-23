@@ -15,8 +15,11 @@ class CreateMealsTable extends Migration
     {
         Schema::create('meals', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('category_id')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();
+            
+            $table->foreign('category_id')->references('id')->on('categories');
         });
 
         Schema::create('meal_translations', function (Blueprint $table) {

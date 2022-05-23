@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use App\Models\Language;
 use App\Models\Meal;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -18,7 +19,16 @@ class MealFactory extends Factory
     public function definition()
     {
         $languages = Language::all();
-        $data = [];
+        $categories = Category::all();
+
+        $randomNumber = rand(0, (count($categories) * 2));
+
+        $data = array();
+
+        if ($randomNumber < count($categories)) {
+            $data['category_id'] = $categories[$randomNumber]->id;
+        }
+
         foreach ($languages as $locale) {
             $data[$locale->locale] = [
                 'title' => "Title na {$locale->locale}",

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Language;
 use App\Models\Meal;
 use Exception;
@@ -15,7 +16,7 @@ class MealController extends Controller
 
     public function indexCreate(Request $request) {
         $meal = new Meal();
-        app()->setLocale('fr');
+        app()->setLocale('en');
         
         /*
         try {
@@ -42,7 +43,19 @@ class MealController extends Controller
             $paginate = $request->get('per_page');
         }
 
+        if ($request->has('with')) {
+            $possible = array(
+				'ingredients',
+				'category',
+				'tags'
+			);
+
+            $got = array_intersect($possible, explode(',', $request->get('with')));
+            $mealQuery = $mealQuery->with($got);
+        }
+        
+
         return $mealQuery->paginate($paginate);
-        return Meal::all();
+        return $mealQuery::all();
     }
 }

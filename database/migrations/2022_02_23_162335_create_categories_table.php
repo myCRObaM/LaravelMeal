@@ -18,15 +18,14 @@ class CreateCategoriesTable extends Migration
             $table->string('slug');
         });
 
-        Schema::create('categories_translations', function (Blueprint $table) {
+        Schema::create('category_translations', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('category_id')->unsigned();
-            $table->bigInteger('locale')->unsigned();
+            $table->string('locale');
             $table->string('title');
 
             $table->unique(['category_id','locale']);
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('locale')->references('id')->on('languages')->onDelete('cascade');
         });
     }
 
