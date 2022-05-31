@@ -10,33 +10,15 @@ use Illuminate\Http\Request;
 
 class MealController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         return Meal::all();
     }
 
-    public function indexCreate(Request $request) {
-        $meal = new Meal();
+    public function indexCreate(Request $request)
+    {
         app()->setLocale('en');
-        
-        /*
-        try {
-            foreach (['hr', 'en', 'nl', 'fr', 'de'] as $locale) {
-                $language = new Language();
-                $language->locale = $locale;
-                $language->save();
-            }
-        } catch (Exception $e) {
-            // ignore ako postoje podatci
-        }
 
-        $languages = Language::all();
-
-        foreach ($languages as $locale) {
-            $meal->translateOrNew($locale->id)->title = "Title na {$locale->locale}";
-            $meal->translateOrNew($locale->id)->description = "Description na {$locale->locale}";
-        }
-        $meal->save();
-        */
         $paginate = 20;
         $mealQuery = Meal::query();
         if ($request->has('per_page')) {
@@ -45,17 +27,46 @@ class MealController extends Controller
 
         if ($request->has('with')) {
             $possible = array(
-				'ingredients',
-				'category',
-				'tags'
-			);
+                'ingredients',
+                'category',
+                'tags'
+            );
 
             $got = array_intersect($possible, explode(',', $request->get('with')));
             $mealQuery = $mealQuery->with($got);
         }
-        
+
+        if ($request->has('category')) {
+            $categoryFilter = strtolower($request->get('category'));
+            if ($categoryFilter == "null") {
+                $mealQuery = $mealQuery->whereNull('category_id');
+            } else if ($categoryFilter == "!null") {
+                $mealQuery = $mealQuery->WhereNotNull('category_id');
+            } else {
+                $mealQuery = $mealQuery->where('category_id', '=', $categoryFilter);
+            }
+        }
+
+        if ($request->has('tags')) {
+            $got = explode(',', $request->get('tags'));
+            //$mealQuery = $mealQuery->where('tag_id', $got);
+            foreach ($got as $tag) {
+                $mealQuery = $mealQuery->whereHas('tags', function ($q) use ($tag) {
+                    $q = $q->where('tag_id', '=', $tag);
+                });
+            }
+        }
+
+        if ($request->has('diff_time')) {
+            $time = new \DateTime();
+            $time->setTimestamp($request->get('diff_time'));
+
+            $mealQuery = $mealQuery->withTrashed()
+                ->where('created_at', '>', $time)
+                ->orWhere('updated_at', '>', $time)
+                ->orWhere('deleted_at', '>', $time);
+        }
 
         return $mealQuery->paginate($paginate);
-        return $mealQuery::all();
     }
 }

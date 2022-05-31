@@ -20,6 +20,16 @@ class Meal extends Model
         return $this->hasOne(Category::class, "id", "category_id");
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, "meals_tags");
+    }
+
+    public function ingredients()
+    {
+        return $this->belongsToMany(Ingredient::class, "meals_ingredients");
+    }
+
     protected function getStatusAttribute() {
         if ($this->deleted_at != null) {
             return 'deleted';
