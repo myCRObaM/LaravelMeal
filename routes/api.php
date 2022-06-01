@@ -15,6 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/meals', [MealController::class, 'index']);
+Route::get('/mealsc', [MealController::class, 'index']);
 
-Route::get('/mealsc', [MealController::class, 'indexCreate']);
+Route::get('/meals', [MealController::class, 'indexFiltered']);
